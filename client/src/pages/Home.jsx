@@ -1,10 +1,11 @@
 import React from 'react'
+import Hero from '../componts/Hero'
 
 function Home() {
   return (
-    <div>
-      <p>this is homeee</p>
-    </div>
+    <>
+     <Hero/>
+    </>
   )
 }
 

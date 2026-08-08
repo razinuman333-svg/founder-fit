@@ -17,7 +17,7 @@ function Navbar() {
   ];
   return (
     <>
-    <div className='fixed top-0  z-50 w-full flex items-center justify-between px-12 md:px-9 lg:px-12 '>
+    <div className='sticky top-0  z-50 w-full flex items-center justify-between px-12 md:px-9 lg:px-12 '>
       <img className='w-auto h-32' src={logo}/>
 
 
@@ -30,7 +30,7 @@ function Navbar() {
 
 
       <button onClick={openSignIn} className='bg-primary px-4 py-1 sm:px-7 sm:py-2 bg-primary
-       rounded-full font-medium cursor-pointer'>login</button>
+       rounded-full text-medium cursor-pointer'>login</button>
 
     </div>
 
