@@ -4,11 +4,17 @@
 
 @import "tailwindcss";
 
-
+@theme{
+   --color-primary:#00236f
+}
 *{
     font-family: "Inter",sans-serif;
 }
 
 .font-heading {
     font-family: "Montserrat", sans-serif;
+}
+body{
+    color:white;
+   
 }
