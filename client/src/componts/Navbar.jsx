@@ -1,6 +1,6 @@
 import React from 'react'
 import logo from '../assets/founderFit-logo.png'
-import { Compass, Heart, MessageSquare, Users } from 'lucide-react'
+import { Compass, Heart, MessageSquare, Users,UserCircle } from 'lucide-react'
 import { useClerk,useUser,UserButton } from '@clerk/clerk-react'
 
 function Navbar() {
@@ -39,7 +39,12 @@ function Navbar() {
             Login
           </button>
         ) : (
-          <UserButton />
+          <UserButton >
+            <UserButton.MenuItems>
+                 <UserButton.Link href='/add-profile' label='Add Profile' labelIcon={<UserCircle width={15}/>}/>
+            </UserButton.MenuItems>
+            
+          </UserButton>
         )}
         </div>
       </header>
