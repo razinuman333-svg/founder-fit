@@ -8,7 +8,8 @@ const UserSchema = new mongoose.Schema({
     bio: { type: String, max: 500 },
     headline: { type: String }, 
     skills: [{ type: String }],
-    experience: { type: String }
+    experience: { type: Array, default: [] },
+    location: { type: String, default: "" }
   }, { timestamps: true });
 
   const User = mongoose.model('User', UserSchema)

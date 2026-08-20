@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useUser } from '@clerk/clerk-react';
+import axios from 'axios'
 import {
 	ArrowLeft,
 	BriefcaseBusiness,
@@ -22,6 +24,7 @@ const initialForm = {
 
 function AddProfile() {
 	const navigate = useNavigate()
+	const { user } = useUser()
 	const [form, setForm] = useState(initialForm)
 	const [skills, setSkills] = useState([])
 	const [skillInput, setSkillInput] = useState('')
@@ -78,9 +81,24 @@ function AddProfile() {
 		if (file) setAvatar(URL.createObjectURL(file))
 	}
 
-	const handleSubmit = (event) => {
+	const handleSubmit = async (event) => {
 		event.preventDefault()
-		setSaved(true)
+
+		try {
+			await axios.post('http://localhost:3000/api/user/add-profile', {
+				userId: user?.id,
+				aboutme: form.about,
+				headline: form.headline,
+				skills,
+				experience: experiences,
+				name: form.fullName,
+				location: form.location,
+				avatar: user?.imageUrl || '',
+			})
+			setSaved(true)
+		} catch (error) {
+			console.error('Failed to save profile:', error)
+		}
 	}
 
 	return (
