@@ -20,19 +20,14 @@ const initialForm = {
 	about: '',
 }
 
-const initialSkills = ['Product Strategy', 'System Architecture', 'Team Building']
-
-const initialVentures = [
-	{ name: 'Northstar Labs', role: 'Co-founder & CEO', dates: '2021 - Present', mark: 'N' },
-	{ name: 'Orbit Commerce', role: 'Founder', dates: '2018 - 2021', mark: 'O' },
-]
-
 function AddProfile() {
 	const navigate = useNavigate()
 	const [form, setForm] = useState(initialForm)
-	const [skills, setSkills] = useState(initialSkills)
+	const [skills, setSkills] = useState([])
 	const [skillInput, setSkillInput] = useState('')
-	const [ventures, setVentures] = useState(initialVentures)
+	const [experiences, setExperiences] = useState([])
+	const [isVentureFormOpen, setIsVentureFormOpen] = useState(false)
+	const [ventureForm, setVentureForm] = useState({ company: '', role: '', dates: '' })
 	const [avatar, setAvatar] = useState('')
 	const [saved, setSaved] = useState(false)
 
@@ -51,11 +46,31 @@ function AddProfile() {
 		setSkillInput('')
 	}
 
-	const addVenture = () => {
-		setVentures((current) => [
+	const updateVentureField = (event) => {
+		const { name, value } = event.target
+		setVentureForm((current) => ({ ...current, [name]: value }))
+	}
+
+	const openVentureForm = () => {
+		setIsVentureFormOpen((current) => !current)
+	}
+
+	const cancelVenture = () => {
+		setVentureForm({ company: '', role: '', dates: '' })
+		setIsVentureFormOpen(false)
+	}
+
+	const saveVenture = () => {
+		const company = ventureForm.company.trim()
+		const role = ventureForm.role.trim()
+		const dates = ventureForm.dates.trim()
+		if (!company || !role || !dates) return
+
+		setExperiences((current) => [
 			...current,
-			{ name: 'New Venture', role: 'Founder', dates: 'Add dates', mark: '+', id: Date.now() },
+			{ company, role, dates, mark: company.charAt(0).toUpperCase(), id: Date.now() },
 		])
+		cancelVenture()
 	}
 
 	const handleAvatar = (event) => {
@@ -108,13 +123,14 @@ function AddProfile() {
 
 					<section className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_2px_12px_rgba(15,23,42,0.03)] sm:p-7">
 						<SectionHeading icon={Sparkles} title="Skills Management" />
-						<div className="mt-6 flex flex-wrap gap-2">{skills.map((skill) => <span key={skill} className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3.5 py-2 text-sm font-medium text-teal-800">{skill}<button type="button" onClick={() => setSkills((current) => current.filter((item) => item !== skill))} className="text-teal-500 transition hover:text-teal-900" aria-label={`Remove ${skill}`}><X size={15} /></button></span>)}</div>
+						{skills.length > 0 && <div className="mt-6 flex flex-wrap gap-2">{skills.map((skill) => <span key={skill} className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3.5 py-2 text-sm font-medium text-teal-800">{skill}<button type="button" onClick={() => setSkills((current) => current.filter((item) => item !== skill))} className="text-teal-500 transition hover:text-teal-900" aria-label={`Remove ${skill}`}><X size={15} /></button></span>)}</div>}
 						<div className="mt-5 flex flex-col gap-3 sm:flex-row"><input value={skillInput} onChange={(event) => setSkillInput(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && addSkill(event)} placeholder="Add a skill (e.g. LLM Ops, GTM Strategy)" className={`${inputClass} flex-1`} /><button type="button" onClick={addSkill} className="rounded-lg border border-teal-600 px-5 py-2.5 text-sm font-semibold text-teal-700 transition hover:bg-teal-50">Add</button></div>
 					</section>
 
 					<section className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_2px_12px_rgba(15,23,42,0.03)] sm:p-7">
-						<div className="flex items-center justify-between gap-4"><SectionHeading icon={BriefcaseBusiness} title="Founder Experience" /><button type="button" onClick={addVenture} className="flex shrink-0 items-center gap-1.5 text-sm font-semibold text-teal-700 transition hover:text-teal-900"><Plus size={17} /> Add Venture</button></div>
-						<div className="mt-6 grid gap-3 md:grid-cols-2">{ventures.map((venture, index) => <div key={venture.id || `${venture.name}-${index}`} className="flex items-center gap-4 rounded-lg border border-slate-200 p-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-900 font-bold text-white">{venture.mark}</div><div className="min-w-0"><h3 className="truncate font-semibold">{venture.name}</h3><p className="mt-0.5 text-sm text-slate-500">{venture.role}</p></div><span className="ml-auto shrink-0 text-right text-xs font-medium text-slate-400">{venture.dates}</span></div>)}</div>
+						<div className="flex items-center justify-between gap-4"><SectionHeading icon={BriefcaseBusiness} title="Founder Experience" /><button type="button" onClick={openVentureForm} className="flex shrink-0 items-center gap-1.5 text-sm font-semibold text-teal-700 transition hover:text-teal-900"><Plus size={17} /> Add Venture</button></div>
+						{isVentureFormOpen && <div className="mt-6 rounded-lg border border-teal-100 bg-teal-50/40 p-4 sm:p-5"><div className="grid gap-4 md:grid-cols-3"><Field label="Company Name"><input name="company" value={ventureForm.company} onChange={updateVentureField} placeholder="e.g. Northstar Labs" className={inputClass} /></Field><Field label="Role"><input name="role" value={ventureForm.role} onChange={updateVentureField} placeholder="e.g. Co-founder & CEO" className={inputClass} /></Field><Field label="Date Range"><input name="dates" value={ventureForm.dates} onChange={updateVentureField} placeholder="e.g. 2021 - Present" className={inputClass} /></Field></div><div className="mt-4 flex justify-end gap-3"><button type="button" onClick={cancelVenture} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-500">Cancel</button><button type="button" onClick={saveVenture} disabled={!ventureForm.company.trim() || !ventureForm.role.trim() || !ventureForm.dates.trim()} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50">Save Venture</button></div></div>}
+						{experiences.length === 0 ? <p className="mt-6 rounded-lg border border-dashed border-slate-200 py-8 text-center text-sm text-slate-400">No ventures added yet. Click &quot;+ Add Venture&quot; to add one.</p> : <div className="mt-6 grid gap-3 md:grid-cols-2">{experiences.map((experience) => <div key={experience.id} className="flex items-center gap-4 rounded-lg border border-slate-200 p-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-900 font-bold text-white">{experience.mark}</div><div className="min-w-0"><h3 className="truncate font-semibold">{experience.company}</h3><p className="mt-0.5 text-sm text-slate-500">{experience.role}</p></div><span className="ml-auto shrink-0 text-right text-xs font-medium text-slate-400">{experience.dates}</span><button type="button" onClick={() => setExperiences((current) => current.filter((item) => item.id !== experience.id))} className="text-slate-400 transition hover:text-red-600" aria-label={`Remove ${experience.company}`}><X size={17} /></button></div>)}</div>}
 					</section>
 					{saved && <p className="text-right text-sm font-medium text-teal-700" role="status">Profile saved successfully.</p>}
 				</form>
