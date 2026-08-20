@@ -8,7 +8,6 @@ const UserSchema = new mongoose.Schema({
     bio: { type: String, max: 500 },
     headline: { type: String }, 
     skills: [{ type: String }],
-    interests: [{ type: String }],
     experience: { type: String }
   }, { timestamps: true });
 
