@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react';
 import axios from 'axios'
+import { toast } from 'react-toastify'
 import {
 	ArrowLeft,
 	BriefcaseBusiness,
@@ -32,14 +33,12 @@ function AddProfile() {
 	const [isVentureFormOpen, setIsVentureFormOpen] = useState(false)
 	const [ventureForm, setVentureForm] = useState({ company: '', role: '', dates: '' })
 	const [avatar, setAvatar] = useState('')
-	const [saved, setSaved] = useState(false)
 
 	useEffect(() => () => avatar && URL.revokeObjectURL(avatar), [avatar])
 
 	const updateField = (event) => {
 		const { name, value } = event.target
 		setForm((current) => ({ ...current, [name]: value }))
-		setSaved(false)
 	}
 
 	const addSkill = (event) => {
@@ -95,7 +94,7 @@ function AddProfile() {
 				location: form.location,
 				avatar: user?.imageUrl || '',
 			})
-			setSaved(true)
+			toast.success('Profile saved successfully')
 		} catch (error) {
 			console.error('Failed to save profile:', error)
 		}
@@ -114,7 +113,7 @@ function AddProfile() {
 					</div>
 					<div className="flex gap-3">
 						<button type="button" onClick={() => navigate(-1)} className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-500">Cancel</button>
-						<button type="submit" form="profile-form" className="flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"><Check size={17} /> Save</button>
+						<button  type="submit" form="profile-form" className="flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"><Check size={17} /> Save</button>
 					</div>
 				</div>
 
@@ -150,7 +149,6 @@ function AddProfile() {
 						{isVentureFormOpen && <div className="mt-6 rounded-lg border border-teal-100 bg-teal-50/40 p-4 sm:p-5"><div className="grid gap-4 md:grid-cols-3"><Field label="Company Name"><input name="company" value={ventureForm.company} onChange={updateVentureField} placeholder="e.g. Northstar Labs" className={inputClass} /></Field><Field label="Role"><input name="role" value={ventureForm.role} onChange={updateVentureField} placeholder="e.g. Co-founder & CEO" className={inputClass} /></Field><Field label="Date Range"><input name="dates" value={ventureForm.dates} onChange={updateVentureField} placeholder="e.g. 2021 - Present" className={inputClass} /></Field></div><div className="mt-4 flex justify-end gap-3"><button type="button" onClick={cancelVenture} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-500">Cancel</button><button type="button" onClick={saveVenture} disabled={!ventureForm.company.trim() || !ventureForm.role.trim() || !ventureForm.dates.trim()} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50">Save Venture</button></div></div>}
 						{experiences.length === 0 ? <p className="mt-6 rounded-lg border border-dashed border-slate-200 py-8 text-center text-sm text-slate-400">No ventures added yet. Click &quot;+ Add Venture&quot; to add one.</p> : <div className="mt-6 grid gap-3 md:grid-cols-2">{experiences.map((experience) => <div key={experience.id} className="flex items-center gap-4 rounded-lg border border-slate-200 p-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-900 font-bold text-white">{experience.mark}</div><div className="min-w-0"><h3 className="truncate font-semibold">{experience.company}</h3><p className="mt-0.5 text-sm text-slate-500">{experience.role}</p></div><span className="ml-auto shrink-0 text-right text-xs font-medium text-slate-400">{experience.dates}</span><button type="button" onClick={() => setExperiences((current) => current.filter((item) => item.id !== experience.id))} className="text-slate-400 transition hover:text-red-600" aria-label={`Remove ${experience.company}`}><X size={17} /></button></div>)}</div>}
 					</section>
-					{saved && <p className="text-right text-sm font-medium text-teal-700" role="status">Profile saved successfully.</p>}
 				</form>
 			</div>
 		</main>
