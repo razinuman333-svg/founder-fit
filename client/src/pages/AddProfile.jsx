@@ -85,7 +85,7 @@ function AddProfile() {
 		event.preventDefault()
 
 		try {
-			await axios.post('http://localhost:3000/api/user/add-profile', {
+			await axios.post('/api/user/add-profile', {
 				userId: user?.id,
 				aboutme: form.about,
 				headline: form.headline,
