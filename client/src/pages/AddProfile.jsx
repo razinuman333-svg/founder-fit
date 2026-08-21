@@ -101,6 +101,7 @@ function AddProfile() {
 				avatar: avatarUrl,
 			})
 			toast.success('Profile saved successfully')
+			navigate('/')
 		} catch (error) {
 			console.error('Failed to save profile:', error)
 		}
@@ -119,7 +120,7 @@ function AddProfile() {
 					</div>
 					<div className="flex gap-3">
 						<button type="button" onClick={() => navigate(-1)} className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-500">Cancel</button>
-						<button  type="submit" form="profile-form" className="flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"><Check size={17} /> Save</button>
+						<button type="submit" form="profile-form" className="flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"><Check size={17} /> Save</button>
 					</div>
 				</div>
 
