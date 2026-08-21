@@ -33,6 +33,7 @@ function AddProfile() {
 	const [isVentureFormOpen, setIsVentureFormOpen] = useState(false)
 	const [ventureForm, setVentureForm] = useState({ company: '', role: '', dates: '' })
 	const [avatar, setAvatar] = useState('')
+	const [avatarFile, setAvatarFile] = useState(null)
 
 	useEffect(() => () => avatar && URL.revokeObjectURL(avatar), [avatar])
 
@@ -77,13 +78,18 @@ function AddProfile() {
 
 	const handleAvatar = (event) => {
 		const file = event.target.files?.[0]
-		if (file) setAvatar(URL.createObjectURL(file))
+		if (file) {
+			setAvatarFile(file)
+			setAvatar(URL.createObjectURL(file))
+		}
 	}
 
 	const handleSubmit = async (event) => {
 		event.preventDefault()
 
 		try {
+			const avatarUrl = avatarFile ? await fileToDataUrl(avatarFile) : user?.imageUrl || ''
+
 			await axios.post('/api/user/add-profile', {
 				userId: user?.id,
 				aboutme: form.about,
@@ -92,7 +98,7 @@ function AddProfile() {
 				experience: experiences,
 				name: form.fullName,
 				location: form.location,
-				avatar: user?.imageUrl || '',
+				avatar: avatarUrl,
 			})
 			toast.success('Profile saved successfully')
 		} catch (error) {
@@ -154,6 +160,13 @@ function AddProfile() {
 		</main>
 	)
 }
+
+const fileToDataUrl = (file) => new Promise((resolve, reject) => {
+	const reader = new FileReader()
+	reader.onload = () => resolve(reader.result)
+	reader.onerror = reject
+	reader.readAsDataURL(file)
+})
 
 const inputClass = 'w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:ring-2 focus:ring-teal-100'
 
