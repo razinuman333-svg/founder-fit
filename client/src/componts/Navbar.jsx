@@ -2,10 +2,16 @@ import React from 'react'
 import logo from '../assets/founderFit-logo.png'
 import { Compass, Heart, MessageSquare, Users,UserCircle } from 'lucide-react'
 import { useClerk,useUser,UserButton } from '@clerk/clerk-react'
+import { useNavigate } from 'react-router-dom'
 
 function Navbar() {
+
+
   const { openSignIn } = useClerk()
   const { user } = useUser()
+  const navigate = useNavigate()
+
+
 
   const navItems = [
     { label: 'Discover', icon: Compass, active: true },
@@ -25,10 +31,18 @@ function Navbar() {
           />
 
           <ul className='hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-8 text-gray-600 font-medium'>
-            <li className='cursor-pointer hover:text-primary transition-colors'>Home</li>
-            <li className='cursor-pointer hover:text-primary transition-colors'>Matches</li>
-            <li className='cursor-pointer hover:text-primary transition-colors'>Messages</li>
-            <li className='cursor-pointer hover:text-primary transition-colors'>Network</li>
+            <li className='cursor-pointer hover:text-primary transition-colors' onClick={() => navigate('/')}>
+              Home
+            </li>
+            <li className='cursor-pointer hover:text-primary transition-colors' onClick={() => navigate('/matches')}>
+              Matches
+            </li>
+            <li className='cursor-pointer hover:text-primary transition-colors' onClick={() => navigate('/messages')}>
+              Messages
+            </li>
+            <li className='cursor-pointer hover:text-primary transition-colors' onClick={() => navigate('/network')}>
+              Network
+            </li>
           </ul>
 
         {!user ? (
@@ -52,6 +66,7 @@ function Navbar() {
       <nav className='md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 py-2 px-6 flex justify-between items-center z-50'>
         {navItems.map((item) => (
           <button
+          onClick={()=>navigate(`/${item.label.toLowerCase()}`)}
             key={item.label}
             className={`flex flex-col items-center justify-center gap-1 relative ${
               item.active ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'

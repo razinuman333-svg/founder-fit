@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import Home from './pages/Home'
 import AddProfile from './pages/AddProfile'
 import { ToastContainer } from 'react-toastify'
+import Network from './pages/Network'
 
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
      <Routes>
       <Route path='/' element={<Home/>}/>
       <Route path='/add-profile' element={<AddProfile/>}/>
+      <Route path = '/network' element={<Network/>}/>
      </Routes>
     <ToastContainer />
     </>
