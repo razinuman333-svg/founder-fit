@@ -27,3 +27,26 @@ export const addProfile = async (req,res) => {
        return res.status(500).json({ message: error.message });
    }
 }
+
+
+
+
+
+
+export const getAllUser = async(req,res) => {
+    try{
+           const users = await User.find({})
+    res.status(200).json({
+        success:true,
+        data:users
+    })
+
+    }catch(error){
+         res.status(500).json({
+            success:false,
+            message:'Server Error: Unable to fetch users',
+            error:error.message
+         })
+    }
+    
+}
