@@ -51,6 +51,10 @@ export const getAllUser = async(req,res) => {
     
 }
 
+
+
+
+
 export const getUserById = async(req,res) => {
     try {
         const user = await User.findById(req.params.id)

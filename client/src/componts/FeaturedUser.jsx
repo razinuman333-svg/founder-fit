@@ -40,7 +40,7 @@ if(isLoading) return <p>Loading users...</p>;
           {featuredUsers.slice(0, 3).map((user) => (
             <article
               key={user._id || user.id || user.name}
-              onClick={() => (user._id || user.id) && navigate(`/user/${user._id || user.id}`)}
+              onClick={() => { if (user._id || user.id) { navigate(`/user/${user._id || user.id}`); scrollTo(0, 0); } }}
               onKeyDown={(event) => event.key === 'Enter' && (user._id || user.id) && navigate(`/user/${user._id || user.id}`)}
               role={(user._id || user.id) ? 'button' : undefined}
               tabIndex={(user._id || user.id) ? 0 : undefined}
