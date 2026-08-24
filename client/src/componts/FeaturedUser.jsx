@@ -35,7 +35,7 @@ if(isLoading) return <p>Loading users...</p>;
         </div>
 
         <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-          {featuredUsers.map((user) => (
+          {featuredUsers.slice(0, 3).map((user) => (
             <article
               key={user.name}
               className='relative h-[420px] overflow-hidden rounded-3xl bg-gray-900 shadow-lg'
