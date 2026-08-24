@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react"
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'
 
 
 function FeaturedUser() {
 
 const [featuredUsers,setFeaturedUsers] =  useState([])
 const [isLoading,setIsLoading] = useState(true)
+const navigate = useNavigate()
 
 
 const getAllUsers = async() => {
@@ -37,7 +39,11 @@ if(isLoading) return <p>Loading users...</p>;
         <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
           {featuredUsers.slice(0, 3).map((user) => (
             <article
-              key={user.name}
+              key={user._id || user.id || user.name}
+              onClick={() => (user._id || user.id) && navigate(`/user/${user._id || user.id}`)}
+              onKeyDown={(event) => event.key === 'Enter' && (user._id || user.id) && navigate(`/user/${user._id || user.id}`)}
+              role={(user._id || user.id) ? 'button' : undefined}
+              tabIndex={(user._id || user.id) ? 0 : undefined}
               className='relative h-[420px] overflow-hidden rounded-3xl bg-gray-900 shadow-lg'
             >
               <img
@@ -63,7 +69,7 @@ if(isLoading) return <p>Loading users...</p>;
                 <p className='mt-3 line-clamp-3 text-sm leading-relaxed text-gray-200'>
                   {user.headline}
                 </p>
-                <button className='mt-3 w-full rounded-xl bg-blue-600 py-2.5 font-medium text-white transition-colors hover:bg-blue-700'>
+                <button onClick={(event) => event.stopPropagation()} className='mt-3 w-full rounded-xl bg-blue-600 py-2.5 font-medium text-white transition-colors hover:bg-blue-700'>
                   Connect
                 </button>
               </div>
