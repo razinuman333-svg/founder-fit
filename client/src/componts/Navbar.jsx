@@ -1,4 +1,3 @@
-import React from 'react'
 import logo from '../assets/founderFit-logo.png'
 import { Compass, Heart, MessageSquare, Users,UserCircle } from 'lucide-react'
 import { useClerk,useUser,UserButton } from '@clerk/clerk-react'
@@ -12,13 +11,6 @@ function Navbar() {
   const navigate = useNavigate()
 
 
-
-  const navItems = [
-    { label: 'Discover', icon: Compass, active: true },
-    { label: 'Matches', icon: Heart, active: false },
-    { label: 'Messages', icon: MessageSquare, active: false, badge: true },
-    { label: 'Network', icon: Users, active: false },
-  ]
 
   return (
     <>
@@ -64,20 +56,45 @@ function Navbar() {
       </header>
 
       <nav className='md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 py-2 px-6 flex justify-between items-center z-50'>
-        {navItems.map((item) => (
-          <button
-          onClick={()=>navigate(`/${item.label.toLowerCase()}`)}
-            key={item.label}
-            className={`flex flex-col items-center justify-center gap-1 relative ${
-              item.active ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
-            <div className='relative'>
-              <item.icon className='w-6 h-6' />
-            </div>
-            <span className='text-xs font-medium'>{item.label}</span>
-          </button>
-        ))}
+        <button
+          onClick={() => navigate('/')}
+          className='flex flex-col items-center justify-center gap-1 relative text-blue-600'
+        >
+          <div className='relative'>
+            <Compass className='w-6 h-6' />
+          </div>
+          <span className='text-xs font-medium'>Home</span>
+        </button>
+
+        <button
+          onClick={() => navigate('/matches')}
+          className='flex flex-col items-center justify-center gap-1 relative text-gray-400 hover:text-gray-600'
+        >
+          <div className='relative'>
+            <Heart className='w-6 h-6' />
+          </div>
+          <span className='text-xs font-medium'>Matches</span>
+        </button>
+
+        <button
+          onClick={() => navigate('/messages')}
+          className='flex flex-col items-center justify-center gap-1 relative text-gray-400 hover:text-gray-600'
+        >
+          <div className='relative'>
+            <MessageSquare className='w-6 h-6' />
+          </div>
+          <span className='text-xs font-medium'>Messages</span>
+        </button>
+
+        <button
+          onClick={() => navigate('/network')}
+          className='flex flex-col items-center justify-center gap-1 relative text-gray-400 hover:text-gray-600'
+        >
+          <div className='relative'>
+            <Users className='w-6 h-6' />
+          </div>
+          <span className='text-xs font-medium'>Network</span>
+        </button>
       </nav>
     </>
   )

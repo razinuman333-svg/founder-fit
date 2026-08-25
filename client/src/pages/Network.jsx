@@ -3,7 +3,7 @@ import { UserPlus } from 'lucide-react'
 import { useState ,useEffect} from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-
+import PageMessage from '../componts/PageMessage'
 
 function Network() {
 
@@ -23,7 +23,7 @@ useEffect(() => {
     getAllUsers()
 },[])
 
-if(isLoading) return <p>Loading users...</p>;
+ if (isLoading) return <PageMessage message="Loading..." />
 
 
   return (
@@ -46,7 +46,7 @@ if(isLoading) return <p>Loading users...</p>;
           return (
           <div
             key={userId || name}
-            onClick={() => userId && navigate(`/user/${userId}`)}
+            onClick={() => {userId && navigate(`/user/${userId}`); scrollTo(0, 0); }}
             onKeyDown={(event) => event.key === 'Enter' && userId && navigate(`/user/${userId}`)}
             role={userId ? 'button' : undefined}
             tabIndex={userId ? 0 : undefined}
