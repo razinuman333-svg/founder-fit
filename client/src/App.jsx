@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import AddProfile from './pages/AddProfile'
 import { ToastContainer } from 'react-toastify'
 import Network from './pages/Network'
+import UserDetails from './pages/UserDetails'
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <Route path='/' element={<Home/>}/>
       <Route path='/add-profile' element={<AddProfile/>}/>
       <Route path = '/network' element={<Network/>}/>
+      <Route path='/user/:userId' element={<UserDetails/>}/>
      </Routes>
     <ToastContainer />
     </>
