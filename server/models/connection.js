@@ -2,9 +2,9 @@ import mongoose from 'mongoose'
 
 const connectionSchema = new mongoose.Schema({
 
-    senderID : {type:mongoose.Schema.Types.ObjectId, ref:'User'},
+    senderID : {type:String, ref:'User'},
 
-    receiverID : {type:mongoose.Schema.Types.ObjectId, ref:'User'},
+   receiverID  : {type:String, ref:'User'},
 
     status : {type:String , default: "pending"}
 

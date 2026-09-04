@@ -1,8 +1,9 @@
 import express from 'express'
-import { createConnection } from '../controllers/connectionController'
+import { createConnection, getConnection } from '../controllers/connectionController.js'
 const connectionRouter = express.Router()
 
-connectionRouter.post('/:receiverId',createConnection)
+connectionRouter.post('/send/:receiverID',createConnection)
+connectionRouter.get('/get',getConnection)
 
 
 export default connectionRouter
