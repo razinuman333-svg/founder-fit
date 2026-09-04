@@ -1,21 +1,54 @@
 import { useEffect, useState } from "react"
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'
+import { useAuth,useUser } from "@clerk/clerk-react";
+import { toast } from 'react-toastify'
 
 
 function FeaturedUser() {
 
+
 const [featuredUsers,setFeaturedUsers] =  useState([])
 const [isLoading,setIsLoading] = useState(true)
 const navigate = useNavigate()
+const {getToken}=useAuth()
+const {user} = useUser()
+
+
 
 
 const getAllUsers = async() => {
 
   const values = await axios.get('/api/user')
   setFeaturedUsers(values.data.data)
+  console.log(setFeaturedUsers)
   setIsLoading(false)
 }
+
+
+
+
+
+const sendConnectionReq = async(id) => {
+  try {
+
+    if(!user) return toast.error('Please login to proceed');
+
+
+   const {data} = await axios.post(`/api/connection/send/${id}`,{},{headers: { Authorization: `Bearer ${await getToken()}` }})
+
+   if(data.success){
+     toast.success('Connection Sent')
+   }
+  } catch (error) {
+    toast.error(error.message)
+  }
+    
+}
+
+
+
+
 
 useEffect(() => {
     getAllUsers()
@@ -69,7 +102,7 @@ if(isLoading) return <p>Loading users...</p>;
                 <p className='mt-3 line-clamp-3 text-sm leading-relaxed text-gray-200'>
                   {user.headline}
                 </p>
-                <button onClick={(event) => event.stopPropagation()} className='mt-3 w-full rounded-xl bg-blue-600 py-2.5 font-medium text-white transition-colors hover:bg-blue-700'>
+                <button onClick={(event) => { event.stopPropagation();sendConnectionReq(user._id)}} className='mt-3 w-full rounded-xl bg-blue-600 py-2.5 font-medium text-white transition-colors hover:bg-blue-700'>
                   Connect
                 </button>
               </div>

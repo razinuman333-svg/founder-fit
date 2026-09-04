@@ -8,6 +8,10 @@
     const {receiverID} = req.params
     const {userId} = req.auth()
 
+    if(!userId){
+        return res.status(401).json({success:false,message:'Unauthorized'})
+    }
+
     const connection = await Connection.create({
         senderID : userId,
         receiverID : receiverID,
