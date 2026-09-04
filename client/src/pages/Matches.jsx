@@ -1,32 +1,12 @@
 import React from 'react'
 import { MessageSquare, Search } from 'lucide-react'
+import { useState } from 'react'
+import axios from 'axios'
+import { useAuth,useUser } from "@clerk/clerk-react";
+import PageMessage from '../componts/PageMessage'
+import { useEffect } from 'react';
+import { toast } from 'react-toastify'
 
-const connectionRequests = [
-  {
-    id: 1,
-    name: 'Ava Thompson',
-    role: 'CTO',
-    company: 'GreenPulse',
-    image:
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    id: 2,
-    name: 'Daniel Kim',
-    role: 'VP Product',
-    company: 'Northstar Labs',
-    image:
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    id: 3,
-    name: 'Priya Shah',
-    role: 'Founder',
-    company: 'Helio Works',
-    image:
-      'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80',
-  },
-]
 
 const allMatches = [
   {
@@ -86,6 +66,60 @@ const allMatches = [
 ]
 
 function Matches() {
+
+
+
+const [isLoading,setIsLoading] = useState(true)
+const [requestedUsers,setRequestedUsers] = useState([])
+const {getToken} = useAuth()
+
+
+
+const getConnectionRequests = async() => {
+    try {
+      const {data} = await axios.get('/api/connection/get',{headers: { Authorization: `Bearer ${await getToken()}` }})
+      if(data.success){
+        setRequestedUsers(data.connectionReq)
+      }
+      
+    } catch (error) {
+      console.log(error.message)
+    } 
+    finally{
+       setIsLoading(false)
+    }
+}
+
+
+
+
+
+const handleaccept = async(id) => {
+
+        try {
+
+          await axios.put(`/api/connection/updatetoaccept/${id}`,{},{headers: { Authorization: `Bearer ${await getToken()}` }})
+          setRequestedUsers(prev => prev.filter(req => req.senderID._id !== id));
+          toast.success("Request accepted!");
+
+        } 
+        catch (error) {
+
+          toast.error(error.message)
+
+        }
+}
+
+
+useEffect(()=>{
+     getConnectionRequests()
+},[])
+
+
+if (isLoading) return <PageMessage message="Loading..." />
+console.log(requestedUsers)
+
+
   return (
     <div className='min-h-screen bg-slate-50 px-4 py-8 text-slate-900 md:px-8 lg:px-10'>
       <div className='mx-auto max-w-6xl'>
@@ -95,13 +129,7 @@ function Matches() {
             <h1 className='mt-2 text-3xl font-bold text-slate-900'>Matches</h1>
           </div>
 
-          <button
-            type='button'
-            className='flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-900'
-            aria-label='Search matches'
-          >
-            <Search className='h-5 w-5' />
-          </button>
+         
         </div>
 
         <section className='mb-10'>
@@ -116,26 +144,27 @@ function Matches() {
           </div>
 
           <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
-            {connectionRequests.map((person) => (
+            {requestedUsers.map((person) => (
               <div
-                key={person.id}
+                key={person.senderID._id}
                 className='rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center shadow-sm'
               >
                 <div className='mb-4 flex justify-center'>
                   <img
-                    src={person.image}
+                    src={person.senderID.avatar}
                     alt={person.name}
                     className='h-24 w-24 rounded-full object-cover ring-4 ring-white'
                   />
                 </div>
 
-                <h3 className='text-xl font-bold text-slate-900'>{person.name}</h3>
+                <h3 className='text-xl font-bold text-slate-900'>{person.senderID.name}</h3>
                 <p className='mt-1 text-sm text-slate-600'>
-                  {person.role} @ {person.company}
+                  {person.senderID.headline}
                 </p>
 
                 <div className='mt-5 flex items-center justify-center gap-3'>
                   <button
+                  onClick={() => handleaccept(person.senderID._id) }
                     type='button'
                     className='rounded-full bg-slate-900 px-5 py-1.5 text-sm font-medium text-white transition hover:bg-slate-700'
                   >
@@ -152,6 +181,10 @@ function Matches() {
             ))}
           </div>
         </section>
+
+
+
+        
 
         <section>
           <div className='mb-6 flex items-center justify-between'>
