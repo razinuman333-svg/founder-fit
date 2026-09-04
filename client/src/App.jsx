@@ -5,6 +5,7 @@ import AddProfile from './pages/AddProfile'
 import { ToastContainer } from 'react-toastify'
 import Network from './pages/Network'
 import UserDetails from './pages/UserDetails'
+import Matches from './pages/Matches'
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
       <Route path='/add-profile' element={<AddProfile/>}/>
       <Route path = '/network' element={<Network/>}/>
       <Route path='/user/:userId' element={<UserDetails/>}/>
+      <Route path='/matches' element={<Matches/>}/>
      </Routes>
     <ToastContainer />
     </>
