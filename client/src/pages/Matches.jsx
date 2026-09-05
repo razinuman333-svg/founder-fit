@@ -2,122 +2,85 @@ import React from 'react'
 import { MessageSquare, Search } from 'lucide-react'
 import { useState } from 'react'
 import axios from 'axios'
-import { useAuth,useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import PageMessage from '../componts/PageMessage'
 import { useEffect } from 'react';
 import { toast } from 'react-toastify'
 
 
-const allMatches = [
-  {
-    id: 1,
-    name: 'Leah Martin',
-    title: 'Product Designer',
-    company: 'Luma Studio',
-    image:
-      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80',
-    tags: ['Product Design', 'Web3', 'SaaS'],
-  },
-  {
-    id: 2,
-    name: 'Marcus Reed',
-    title: 'Growth Lead',
-    company: 'Signal Forge',
-    image:
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1200&q=80',
-    tags: ['Marketing', 'AI', 'B2B'],
-  },
-  {
-    id: 3,
-    name: 'Sofia Alvarez',
-    title: 'Head of Strategy',
-    company: 'BrightPeak',
-    image:
-      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1200&q=80',
-    tags: ['Operations', 'Fintech', 'Partnerships'],
-  },
-  {
-    id: 4,
-    name: 'Ethan Brooks',
-    title: 'Frontend Engineer',
-    company: 'Motive Grid',
-    image:
-      'https://images.unsplash.com/photo-1504593811423-6dd665756598?auto=format&fit=crop&w=1200&q=80',
-    tags: ['Engineering', 'Design Systems', 'SaaS'],
-  },
-  {
-    id: 5,
-    name: 'Nina Patel',
-    title: 'Community Builder',
-    company: 'Founders Circle',
-    image:
-      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1200&q=80',
-    tags: ['Community', 'Brand', 'Startup'],
-  },
-  {
-    id: 6,
-    name: 'Oliver Grant',
-    title: 'Data Product Manager',
-    company: 'Northbridge',
-    image:
-      'https://images.unsplash.com/photo-1504593811423-6dd665756598?auto=format&fit=crop&w=1200&q=80',
-    tags: ['Analytics', 'AI', 'HealthTech'],
-  },
-]
-
 function Matches() {
 
 
 
-const [isLoading,setIsLoading] = useState(true)
-const [requestedUsers,setRequestedUsers] = useState([])
-const {getToken} = useAuth()
+  const [isLoading, setIsLoading] = useState(true)
+  const [requestedUsers, setRequestedUsers] = useState([])
+  const { getToken } = useAuth()
+  const [connectedUsers, setConnectedUsers] = useState([])
 
 
 
-const getConnectionRequests = async() => {
+  const getConnectionRequests = async () => {
     try {
-      const {data} = await axios.get('/api/connection/get',{headers: { Authorization: `Bearer ${await getToken()}` }})
-      if(data.success){
+      const { data } = await axios.get('/api/connection/get', { headers: { Authorization: `Bearer ${await getToken()}` } })
+      if (data.success) {
         setRequestedUsers(data.connectionReq)
       }
-      
+
     } catch (error) {
       console.log(error.message)
-    } 
-    finally{
-       setIsLoading(false)
     }
-}
+    finally {
+      setIsLoading(false)
+    }
+  }
+
+
+
+
+  const getConnectedUsers = async () => {
+    try {
+      const { data } = await axios.get('/api/connection/getConnectedUsers', { headers: { Authorization: `Bearer ${await getToken()}` } })
+      if (data.success) {
+        setConnectedUsers(data.connectedUsers)
+      }
+    } catch (error) {
+      console.log(error.message)
+    }
+    finally {
+      setIsLoading(false)
+      
+    }
+  }
 
 
 
 
 
-const handleaccept = async(id) => {
+  const handleaccept = async (id) => {
 
-        try {
+    try {
 
-          await axios.put(`/api/connection/updatetoaccept/${id}`,{},{headers: { Authorization: `Bearer ${await getToken()}` }})
-          setRequestedUsers(prev => prev.filter(req => req.senderID._id !== id));
-          toast.success("Request accepted!");
+      await axios.put(`/api/connection/updatetoaccept/${id}`, {}, { headers: { Authorization: `Bearer ${await getToken()}` } })
+      setRequestedUsers(prev => prev.filter(req => req.senderID._id !== id));
+      toast.success("Request accepted!");
 
-        } 
-        catch (error) {
+    }
+    catch (error) {
 
-          toast.error(error.message)
+      toast.error(error.message)
 
-        }
-}
-
-
-useEffect(()=>{
-     getConnectionRequests()
-},[])
+    }
+  }
 
 
-if (isLoading) return <PageMessage message="Loading..." />
-console.log(requestedUsers)
+  useEffect(() => {
+    getConnectionRequests()
+    getConnectedUsers()
+  }, [])
+
+
+  if (isLoading) return <PageMessage message="Loading..." />
+
 
 
   return (
@@ -129,7 +92,7 @@ console.log(requestedUsers)
             <h1 className='mt-2 text-3xl font-bold text-slate-900'>Matches</h1>
           </div>
 
-         
+
         </div>
 
         <section className='mb-10'>
@@ -164,7 +127,7 @@ console.log(requestedUsers)
 
                 <div className='mt-5 flex items-center justify-center gap-3'>
                   <button
-                  onClick={() => handleaccept(person.senderID._id) }
+                    onClick={() => handleaccept(person.senderID._id)}
                     type='button'
                     className='rounded-full bg-slate-900 px-5 py-1.5 text-sm font-medium text-white transition hover:bg-slate-700'
                   >
@@ -184,7 +147,7 @@ console.log(requestedUsers)
 
 
 
-        
+
 
         <section>
           <div className='mb-6 flex items-center justify-between'>
@@ -192,13 +155,13 @@ console.log(requestedUsers)
           </div>
 
           <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
-            {allMatches.map((person) => (
+            {connectedUsers.map((person) => (
               <article
-                key={person.id}
+                key={person._id}
                 className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'
               >
                 <img
-                  src={person.image}
+                  src={person.avatar}
                   alt={person.name}
                   className='h-48 w-full object-cover'
                 />
@@ -207,12 +170,12 @@ console.log(requestedUsers)
                   <div>
                     <h3 className='text-xl font-bold text-slate-900'>{person.name}</h3>
                     <p className='mt-1 text-sm text-slate-600'>
-                      {person.title} @ {person.company}
+                      {person.headline}
                     </p>
                   </div>
 
                   <div className='flex flex-wrap gap-2'>
-                    {person.tags.map((tag) => (
+                    {person.skills.map((tag) => (
                       <span
                         key={tag}
                         className='rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700'

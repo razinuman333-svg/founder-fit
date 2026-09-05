@@ -18,11 +18,18 @@ const {user} = useUser()
 
 
 const getAllUsers = async() => {
+   try {
+    const {data} = await axios.get('/api/user')
+  setFeaturedUsers(data.data)
 
-  const values = await axios.get('/api/user')
-  setFeaturedUsers(values.data.data)
-  console.log(setFeaturedUsers)
-  setIsLoading(false)
+   } 
+   catch (error) {
+    console.log(error.message)
+   } 
+   finally {
+    setIsLoading(false)
+   }
+  
 }
 
 
