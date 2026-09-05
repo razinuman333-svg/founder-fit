@@ -41,7 +41,16 @@ export const addProfile = async (req,res) => {
 
 export const getAllUser = async(req,res) => {
     try{
-           const users = await User.find({})
+           const { currentUserId } = req.query;
+
+    // If currentUserId exists, exclude it; otherwise find all users
+    const query = currentUserId 
+      ? { _id: { $ne: currentUserId } } 
+      : {};
+
+    const users = await User.find(query);
+
+    
     res.status(200).json({
         success:true,
         data:users

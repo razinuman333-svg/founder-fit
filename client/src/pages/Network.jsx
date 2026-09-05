@@ -4,20 +4,25 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import PageMessage from '../componts/PageMessage'
+import { useUser } from "@clerk/clerk-react";
 
 function Network() {
 
   const [people, setPeople] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
-
+  const {user} = useUser()
 
 
 
   const getAllUsers = async () => {
 
     try {
-      const { data } = await axios.get('/api/user')
+      const { data } = await axios.get('/api/user',{
+      params: {
+        currentUserId: user?.id, 
+      }
+   })
       setPeople(data.data)
 
     } catch (error) {

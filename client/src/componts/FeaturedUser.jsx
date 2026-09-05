@@ -19,7 +19,11 @@ const {user} = useUser()
 
 const getAllUsers = async() => {
    try {
-    const {data} = await axios.get('/api/user')
+    const {data} = await axios.get('/api/user',{
+      params: {
+        currentUserId: user?.id, 
+      }
+   })
   setFeaturedUsers(data.data)
 
    } 
