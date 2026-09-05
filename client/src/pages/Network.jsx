@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import PageMessage from '../componts/PageMessage'
-import { useUser } from "@clerk/clerk-react";
+import { useUser,useAuth } from "@clerk/clerk-react";
+import { toast } from 'react-toastify'
 
 function Network() {
 
@@ -12,6 +13,7 @@ function Network() {
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
   const {user} = useUser()
+  const {getToken} = useAuth()
 
 
 
@@ -31,6 +33,29 @@ function Network() {
       setIsLoading(false)
     }
   }
+
+
+
+
+
+  const sendConnectionReq = async(id) => {
+    try {
+  
+      if(!user) return toast.error('Please login to proceed');
+  
+  
+     const {data} = await axios.post(`/api/connection/send/${id}`,{},{headers: { Authorization: `Bearer ${await getToken()}` }})
+  
+     if(data.success){
+       toast.success('Connection Sent')
+     }
+    } catch (error) {
+      toast.error(error.message)
+    }
+      
+  }
+  
+
 
 
 
@@ -83,7 +108,7 @@ function Network() {
 
               <button
                 type="button"
-                onClick={(event) => event.stopPropagation()}
+                onClick={(event) => {event.stopPropagation();sendConnectionReq(_id)}}
                 className="mt-4 flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold text-gray-800 bg-white border border-gray-300 rounded-full hover:bg-gray-100 transition-colors shadow-sm"
               >
                 <UserPlus size={16} />
