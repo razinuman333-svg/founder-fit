@@ -48,7 +48,7 @@ function Matches() {
     }
     finally {
       setIsLoading(false)
-      
+
     }
   }
 
@@ -60,9 +60,13 @@ function Matches() {
 
     try {
 
-      await axios.put(`/api/connection/updatetoaccept/${id}`, {}, { headers: { Authorization: `Bearer ${await getToken()}` } })
+    const {data} =  await axios.put(`/api/connection/updatetoaccept/${id}`, {}, { headers: { Authorization: `Bearer ${await getToken()}` } })
+      
+        if(data.success){
       setRequestedUsers(prev => prev.filter(req => req.senderID._id !== id));
-      toast.success("Request accepted!");
+      toast.success(data.message);
+        }
+
 
     }
     catch (error) {
@@ -71,6 +75,26 @@ function Matches() {
 
     }
   }
+
+
+
+
+
+  const handlereject = async (id) => {
+
+    try {
+
+      const { data } = await axios.put(`/api/connection/updatetoreject/${id}`, {}, { headers: { Authorization: `Bearer ${await getToken()}` } })
+      if (data.success) {
+        setRequestedUsers(prev => prev.filter(req => req.senderID._id !== id));
+        toast.error(data.message);
+      }
+    }
+    catch (error) {
+      toast.error(error.message)
+    }
+  }
+
 
 
   useEffect(() => {
@@ -134,6 +158,7 @@ function Matches() {
                     Accept
                   </button>
                   <button
+                  onClick={()=> handlereject(person.senderID._id)}
                     type='button'
                     className='rounded-full border border-slate-300 px-5 py-1.5 text-sm font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-800'
                   >

@@ -140,3 +140,49 @@
     });
   }
  }
+
+
+
+
+
+
+
+  export const updateToReject = async(req,res) => {
+    try {
+    const { userId } = req.auth();
+
+    if (!userId) return res.status(401).json({success:false,message:'Unauthorized'})
+
+    const { senderID } = req.params;
+
+    const updatedConnection = await Connection.findOneAndUpdate(
+      {
+        senderID: senderID,
+        receiverID: userId,
+        status: "pending"
+      },
+      {
+        $set: { status: "rejected" }
+      },
+      { new: true } // Returns the updated document
+    );
+
+    if (!updatedConnection) {
+      return res.status(404).json({
+        success: false,
+        message: "Connection request not found or already handled"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Connection request rejected",
+      data: updatedConnection
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+ }
