@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify'
 import Network from './pages/Network'
 import UserDetails from './pages/UserDetails'
 import Matches from './pages/Matches'
+import Message from './pages/Message'
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <Route path = '/network' element={<Network/>}/>
       <Route path='/user/:userId' element={<UserDetails/>}/>
       <Route path='/matches' element={<Matches/>}/>
+      <Route path='/messages' element={<Message/>}/>
      </Routes>
     <ToastContainer />
     </>
