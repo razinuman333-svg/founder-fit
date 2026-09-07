@@ -7,6 +7,7 @@ import connectDB from './config/db.js'
 import { inngest,functions } from './inngest/index.js' 
 import userRouter from './routes/user.js'
 import connectionRouter from './routes/connection.js';
+import messageRouter from './routes/message.js';
 
 const app = express()
 const PORT = 3000
@@ -31,6 +32,7 @@ app.use( "/api/inngest",
 app.get('/',(req,res)=>{res.send('Hello express')})
 app.use('/api/user',userRouter)
 app.use('/api/connection',connectionRouter)
+app.use('/api/message',messageRouter)
 
 
 
