@@ -1,4 +1,6 @@
-
+import Message from '../models/messages.js'
+import Connection from '../models/connection.js'
+import User from '../models/user.js'
 
 
 
@@ -52,5 +54,32 @@ export async function getMessages(req, res) {
   } catch (error) {
     console.error("Error in getMessages:", error.message);
     res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export const getUsersForSidebar = async (req, res) => {
+  try {
+    const { userId } = req.auth()
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' })
+    }
+
+    const connections = await Connection.find({
+      status: 'accepted',
+      $or: [{ senderID: userId }, { receiverID: userId }],
+    }).select('senderID receiverID')
+
+    const connectedUserIds = connections.map((connection) => (
+      connection.senderID === userId ? connection.receiverID : connection.senderID
+    ))
+
+    const users = await User.find({ _id: { $in: connectedUserIds } })
+      .select('name avatar headline skills')
+
+    return res.status(200).json({ success: true, users })
+  } catch (error) {
+    console.error('Error in getUsersForSidebar:', error.message)
+    return res.status(500).json({ success: false, message: 'Internal server error' })
   }
 }
