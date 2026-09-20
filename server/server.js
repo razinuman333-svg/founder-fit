@@ -13,11 +13,14 @@ import authRouter from './routes/auth.js';
 
 
 const PORT = 3000
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 
-await connectDB()
 
-app.use(cors())
+app.use(cors({
+  origin: FRONTEND_URL,
+  credentials: true,
+}));
 app.use(express.json({ limit: '10mb' }))
 app.use(clerkMiddleware())
 app.use( "/api/inngest",
@@ -41,6 +44,7 @@ app.use('/api/message',messageRouter)
 
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
+   connectDB()
   console.log(`Server running on http://localhost:${PORT}`);
 });
