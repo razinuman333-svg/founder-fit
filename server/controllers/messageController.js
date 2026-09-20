@@ -1,6 +1,8 @@
 import Message from '../models/messages.js'
 import Connection from '../models/connection.js'
 import User from '../models/user.js'
+import { hasImageKitConfig, uploadChatMedia } from '../config/imagekit.js'
+import { getReceiverSocketId, io } from '../config/socket.js'
 
 
 
@@ -81,5 +83,51 @@ export const getUsersForSidebar = async (req, res) => {
   } catch (error) {
     console.error('Error in getUsersForSidebar:', error.message)
     return res.status(500).json({ success: false, message: 'Internal server error' })
+  }
+}
+
+
+
+
+
+export async function sendMessage(req, res) {
+  try {
+    const { text } = req.body;
+    const { id: receiverId } = req.params;
+    const senderId = req.user._id;
+
+    let imageUrl;
+    let videoUrl;
+
+    if (req.file) {
+      if (!hasImageKitConfig()) {
+        return res.status(500).json({ message: "Media upload is not configured" });
+      }
+
+      const url = await uploadChatMedia(req.file);
+      if (req.file.mimetype.startsWith("video/")) videoUrl = url;
+      else imageUrl = url;
+    }
+
+    const newMessage = new Message({
+      senderId,
+      receiverId,
+      text,
+      image: imageUrl,
+      video: videoUrl,
+    });
+
+    await newMessage.save();
+
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    // only send the message in realtime if user is online
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    console.error("Error in sendMessage:", error.message);
+    res.status(500).json({ message: "Internal server error" });
   }
 }

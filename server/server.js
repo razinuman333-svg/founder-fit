@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import {app,server} from './config/socket.js'
 import { serve } from "inngest/express";
 import { clerkMiddleware } from '@clerk/express'
 import connectDB from './config/db.js' 
@@ -10,7 +11,7 @@ import connectionRouter from './routes/connection.js';
 import messageRouter from './routes/message.js';
 import authRouter from './routes/auth.js';
 
-const app = express()
+
 const PORT = 3000
 
 
