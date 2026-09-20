@@ -9,7 +9,7 @@ import { getReceiverSocketId, io } from '../config/socket.js'
 
 export async function getConversationsForSidebar(req, res) {
   try {
-    const {userId} = req.auth()
+    const userId = req.user._id;
 
     const conversations = await Message.aggregate([
       // 1. Keep only the messages I sent or received.
@@ -43,7 +43,7 @@ export async function getConversationsForSidebar(req, res) {
 export async function getMessages(req, res) {
   try {
     const { id: userToChatId } = req.params;
-    const {userId} =req.auth()
+    const userId = req.user._id;
 
     const messages = await Message.find({
       $or: [
@@ -61,7 +61,7 @@ export async function getMessages(req, res) {
 
 export const getUsersForSidebar = async (req, res) => {
   try {
-    const { userId } = req.auth()
+    const userId = req.user._id;
 
     if (!userId) {
       return res.status(401).json({ success: false, message: 'Unauthorized' })
