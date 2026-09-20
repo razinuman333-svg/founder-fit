@@ -8,6 +8,7 @@ import { inngest,functions } from './inngest/index.js'
 import userRouter from './routes/user.js'
 import connectionRouter from './routes/connection.js';
 import messageRouter from './routes/message.js';
+import authRouter from './routes/auth.js';
 
 const app = express()
 const PORT = 3000
@@ -31,6 +32,7 @@ app.use( "/api/inngest",
 //API ROUTES
 app.get('/',(req,res)=>{res.send('Hello express')})
 app.use('/api/user',userRouter)
+app.use('/api/auth',authRouter)
 app.use('/api/connection',connectionRouter)
 app.use('/api/message',messageRouter)
 
