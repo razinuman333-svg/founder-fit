@@ -115,7 +115,6 @@ export const useChatStore = create(
       },
 
       setSearchQuery: (searchQuery) => set({ searchQuery }),
-      setSidebarTab: (sidebarTab) => set({ sidebarTab }),
       setComposerText: (composerText) => set({ composerText }),
       setSoundEnabled: (isSoundEnabled) => set({ isSoundEnabled }),
 
@@ -141,7 +140,7 @@ export const useChatStore = create(
       },
     }),
     {
-      name: "imessage-storage",
+      name: "founderfit-storage",
       partialize: (state) => ({ isSoundEnabled: state.isSoundEnabled }),
     },
   ),

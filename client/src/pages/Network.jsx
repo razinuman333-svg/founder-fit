@@ -5,7 +5,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import PageMessage from '../componts/PageMessage'
 import { useUser,useAuth } from "@clerk/clerk-react";
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast'
 
 function Network() {
 

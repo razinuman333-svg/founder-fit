@@ -5,7 +5,7 @@ import axios from 'axios'
 import { useAuth, useUser } from "@clerk/clerk-react";
 import PageMessage from '../componts/PageMessage'
 import { useEffect } from 'react';
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast'
 
 
 function Matches() {
