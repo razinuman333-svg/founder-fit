@@ -2,7 +2,7 @@ import Navbar from './componts/Navbar'
 import { Route, Routes } from 'react-router-dom'
 import Home from './pages/Home'
 import AddProfile from './pages/AddProfile'
-import { ToastContainer } from 'react-toastify'
+import { Toaster } from "react-hot-toast";
 import Network from './pages/Network'
 import UserDetails from './pages/UserDetails'
 import Matches from './pages/Matches'
@@ -21,7 +21,7 @@ function App() {
       <Route path='/matches' element={<Matches/>}/>
       <Route path='/messages' element={<Message/>}/>
      </Routes>
-    <ToastContainer />
+    <Toaster/>
     </>
   )
 }
