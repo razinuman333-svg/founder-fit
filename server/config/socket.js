@@ -1,34 +1,58 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
+import { verifyToken } from "@clerk/backend";
 
 const app = express();
 const server = http.createServer(app);
 
 const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
 
-const io = new Server(server, { cors: { origin: [allowedOrigin] } });
+const io = new Server(server, { cors: { origin: [allowedOrigin], credentials: true } });
 
-function getReceiverSocketId(userId) {
-  return userSocketMap[userId];
+function getReceiverRoom(userId) {
+  return userSocketMap.has(userId) ? `user:${userId}` : null;
 }
 
-// online users map = { userId: socketId }
-const userSocketMap = {};
+const userSocketMap = new Map();
+
+io.use(async (socket, next) => {
+  const token = socket.handshake.auth?.token;
+  if (!token || !process.env.CLERK_SECRET_KEY) {
+    next(new Error("Unauthorized"));
+    return;
+  }
+
+  try {
+    const { data, errors } = await verifyToken(token, {
+      secretKey: process.env.CLERK_SECRET_KEY,
+      authorizedParties: [allowedOrigin],
+    });
+    if (errors?.length || !data?.sub) {
+      next(new Error("Unauthorized"));
+      return;
+    }
+    socket.data.userId = data.sub;
+    next();
+  } catch {
+    next(new Error("Unauthorized"));
+  }
+});
 
 io.on("connection", (socket) => {
-  const userId = socket.handshake.query.userId;
+  const userId = socket.data.userId;
+  const userSockets = userSocketMap.get(userId) || new Set();
+  userSockets.add(socket.id);
+  userSocketMap.set(userId, userSockets);
+  socket.join(`user:${userId}`);
+  io.emit("getOnlineUsers", [...userSocketMap.keys()]);
 
-  if (userId) userSocketMap[userId] = socket.id;
-
-  // io.emit() sends event to everyone - broadcast
-  io.emit("getOnlineUsers", Object.keys(userSocketMap));
-
-  // socket.on is used to listen for events
   socket.on("disconnect", () => {
-    if (userId) delete userSocketMap[userId];
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    const activeSockets = userSocketMap.get(userId);
+    activeSockets?.delete(socket.id);
+    if (!activeSockets?.size) userSocketMap.delete(userId);
+    io.emit("getOnlineUsers", [...userSocketMap.keys()]);
   });
 });
 
-export { app, server, io, getReceiverSocketId };
+export { app, server, io, getReceiverRoom };

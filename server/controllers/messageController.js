@@ -2,7 +2,7 @@ import Message from '../models/messages.js'
 import Connection from '../models/connection.js'
 import User from '../models/user.js'
 import { hasImageKitConfig, uploadChatMedia } from '../config/imagekit.js'
-import { getReceiverSocketId, io } from '../config/socket.js'
+import { getReceiverRoom, io } from '../config/socket.js'
 
 
 
@@ -47,8 +47,8 @@ export async function getMessages(req, res) {
 
     const messages = await Message.find({
       $or: [
-        { senderId: userId, receiverId: userToChatId },
-        { senderId: userToChatId, receiverId: userId },
+        { senderID: userId, receiverID: userToChatId },
+        { senderID: userToChatId, receiverID: userId },
       ],
     }).sort({ createdAt: 1 });
 
@@ -93,8 +93,8 @@ export const getUsersForSidebar = async (req, res) => {
 export async function sendMessage(req, res) {
   try {
     const { text } = req.body;
-    const { id: receiverId } = req.params;
-    const senderId = req.user._id;
+    const { id: receiverID } = req.params;
+    const senderID = req.user._id;
 
     let imageUrl;
     let videoUrl;
@@ -110,22 +110,21 @@ export async function sendMessage(req, res) {
     }
 
     const newMessage = new Message({
-      senderId,
-      receiverId,
+      senderID,
+      receiverID,
       text,
       image: imageUrl,
       video: videoUrl,
     });
 
-    await newMessage.save();
+    const savedMessage = await newMessage.save();
 
-    const receiverSocketId = getReceiverSocketId(receiverId);
-    // only send the message in realtime if user is online
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
+    const receiverRoom = getReceiverRoom(String(receiverID));
+    if (receiverRoom) {
+      io.to(receiverRoom).emit("newMessage", savedMessage);
     }
 
-    res.status(201).json(newMessage);
+    res.status(201).json(savedMessage);
   } catch (error) {
     console.error("Error in sendMessage:", error.message);
     res.status(500).json({ message: "Internal server error" });
