@@ -1,29 +1,69 @@
 import React from 'react'
 import { UserPlus } from 'lucide-react'
-import { useState ,useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import PageMessage from '../componts/PageMessage'
+import { useUser,useAuth } from "@clerk/clerk-react";
+import toast from 'react-hot-toast'
 
 function Network() {
 
-const [people,setPeople] = useState([])
-const [isLoading,setIsLoading] = useState(true)
-const navigate = useNavigate()
+  const [people, setPeople] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const navigate = useNavigate()
+  const {user} = useUser()
+  const {getToken} = useAuth()
 
 
-const getAllUsers = async() => {
 
-  const values = await axios.get('/api/user')
-  setPeople(values.data.data)
-  setIsLoading(false)
-}
+  const getAllUsers = async () => {
 
-useEffect(() => {
+    try {
+      const { data } = await axios.get('/api/user',{
+      params: {
+        currentUserId: user?.id, 
+      }
+   })
+      setPeople(data.data)
+
+    } catch (error) {
+      console.log(error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+
+
+
+
+  const sendConnectionReq = async(id) => {
+    try {
+  
+      if(!user) return toast.error('Please login to proceed');
+  
+  
+     const {data} = await axios.post(`/api/connection/send/${id}`,{},{headers: { Authorization: `Bearer ${await getToken()}` }})
+  
+     if(data.success){
+       toast.success('Connection Sent')
+     }
+    } catch (error) {
+      toast.error(error.message)
+    }
+      
+  }
+  
+
+
+
+
+  useEffect(() => {
     getAllUsers()
-},[])
+  }, [])
 
- if (isLoading) return <PageMessage message="Loading..." />
+  if (isLoading) return <PageMessage message="Loading..." />
 
 
   return (
@@ -44,37 +84,37 @@ useEffect(() => {
           const userId = _id || id
 
           return (
-          <div
-            key={userId || name}
-            onClick={() => {userId && navigate(`/user/${userId}`); scrollTo(0, 0); }}
-            onKeyDown={(event) => event.key === 'Enter' && userId && navigate(`/user/${userId}`)}
-            role={userId ? 'button' : undefined}
-            tabIndex={userId ? 0 : undefined}
-            className="bg-slate-50/80 border border-gray-200 rounded-xl p-4 flex flex-col items-center text-center"
-          >
-            <img
-              src={avatar}
-              alt={name}
-              className="w-16 h-16 rounded-full object-cover mb-3"
-            />
-
-            <h3 className="text-base font-bold text-gray-900">{name}</h3>
-
-            <p className="text-sm font-medium text-gray-600 mt-0.5">
-              {headline}
-            </p>
-
-            <p className="text-xs text-gray-500 mt-1">Based in {location}</p>
-
-            <button
-              type="button"
-              onClick={(event) => event.stopPropagation()}
-              className="mt-4 flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold text-gray-800 bg-white border border-gray-300 rounded-full hover:bg-gray-100 transition-colors shadow-sm"
+            <div
+              key={userId || name}
+              onClick={() => { userId && navigate(`/user/${userId}`); scrollTo(0, 0); }}
+              onKeyDown={(event) => event.key === 'Enter' && userId && navigate(`/user/${userId}`)}
+              role={userId ? 'button' : undefined}
+              tabIndex={userId ? 0 : undefined}
+              className="bg-slate-50/80 border border-gray-200 rounded-xl p-4 flex flex-col items-center text-center"
             >
-              <UserPlus size={16} />
-              Connect
-            </button>
-          </div>
+              <img
+                src={avatar}
+                alt={name}
+                className="w-16 h-16 rounded-full object-cover mb-3"
+              />
+
+              <h3 className="text-base font-bold text-gray-900">{name}</h3>
+
+              <p className="text-sm font-medium text-gray-600 mt-0.5">
+                {headline}
+              </p>
+
+              <p className="text-xs text-gray-500 mt-1">Based in {location}</p>
+
+              <button
+                type="button"
+                onClick={(event) => {event.stopPropagation();sendConnectionReq(_id)}}
+                className="mt-4 flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold text-gray-800 bg-white border border-gray-300 rounded-full hover:bg-gray-100 transition-colors shadow-sm"
+              >
+                <UserPlus size={16} />
+                Connect
+              </button>
+            </div>
           )
         })}
       </div>

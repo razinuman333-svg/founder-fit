@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useUser } from '@clerk/clerk-react';
+import { useUser,useAuth } from '@clerk/clerk-react';
 import axios from 'axios'
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast'
 import {
 	ArrowLeft,
 	BriefcaseBusiness,
@@ -24,6 +24,7 @@ const initialForm = {
 }
 
 function AddProfile() {
+	const {getToken} = useAuth()
 	const navigate = useNavigate()
 	const { user } = useUser()
 	const [form, setForm] = useState(initialForm)
@@ -91,7 +92,7 @@ function AddProfile() {
 			const avatarUrl = avatarFile ? await fileToDataUrl(avatarFile) : user?.imageUrl || ''
 
 			await axios.post('/api/user/add-profile', {
-				userId: user?.id,
+				
 				aboutme: form.about,
 				headline: form.headline,
 				skills,
@@ -99,10 +100,12 @@ function AddProfile() {
 				name: form.fullName,
 				location: form.location,
 				avatar: avatarUrl,
-			})
+			},{ headers: { Authorization: `Bearer ${await getToken()}` } })
 			toast.success('Profile saved successfully')
 			navigate('/')
 		} catch (error) {
+
+			toast.error(error.message || 'Something went wrong!')
 			console.error('Failed to save profile:', error)
 		}
 	}

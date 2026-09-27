@@ -3,7 +3,13 @@ import User from '../models/user.js'
 
 export const addProfile = async (req,res) => {
    try{
-    const { userId, aboutme, headline, skills, experience,name,location,avatar } = req.body;
+    const {userId} = req.auth()
+
+     if(!userId){
+        return res.status(401).json({success:false,message:'Unauthorized'})
+    }
+
+    const { aboutme, headline, skills, experience,name,location,avatar } = req.body;
 
     const user = await User.findById(userId);
 
@@ -22,7 +28,7 @@ export const addProfile = async (req,res) => {
 
     await user.save();
 
-    res.status(200).json({ message: 'Profile updated successfully', user });
+    res.status(200).json({success:true , message: 'Profile updated successfully', user });
    } catch (error) {
        return res.status(500).json({ message: error.message });
    }
@@ -35,7 +41,16 @@ export const addProfile = async (req,res) => {
 
 export const getAllUser = async(req,res) => {
     try{
-           const users = await User.find({})
+           const { currentUserId } = req.query;
+
+    // If currentUserId exists, exclude it; otherwise find all users
+    const query = currentUserId 
+      ? { _id: { $ne: currentUserId } } 
+      : {};
+
+    const users = await User.find(query);
+
+    
     res.status(200).json({
         success:true,
         data:users
